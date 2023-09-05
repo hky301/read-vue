@@ -132,6 +132,7 @@ class BaseReactiveHandler implements ProxyHandler<Target> {
       return res
     }
 
+    // 如果不是 isReadonly，收集依赖
     if (!isReadonly) {
       track(target, TrackOpTypes.GET, key)
     }
@@ -145,6 +146,7 @@ class BaseReactiveHandler implements ProxyHandler<Target> {
       return targetIsArray && isIntegerKey(key) ? res : res.value
     }
 
+    // 如果是 嵌套对象
     if (isObject(res)) {
       // Convert returned value into a proxy as well. we do the isObject check
       // here to avoid invalid value warning. Also need to lazy access readonly
