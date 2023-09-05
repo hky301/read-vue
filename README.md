@@ -1,53 +1,91 @@
-# vuejs/core [![npm](https://img.shields.io/npm/v/vue.svg)](https://www.npmjs.com/package/vue) [![build status](https://github.com/vuejs/core/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vuejs/core/actions/workflows/ci.yml)
+# vue
 
-## Getting Started
+阅读vue3源码
 
-Please follow the documentation at [vuejs.org](https://vuejs.org/)!
+## Git Commit Message Convention
 
-## Sponsors
+#### TL;DR:
 
-Vue.js is an MIT-licensed open source project with its ongoing development made possible entirely by the support of these awesome [backers](https://github.com/vuejs/core/blob/main/BACKERS.md). If you'd like to join them, please consider [ sponsoring Vue's development](https://vuejs.org/sponsor/).
+``` js
+/^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip)(\(.+\))?: .{1,50}/
+```
 
-<p align="center">
-  <h3 align="center">Special Sponsor</h3>
-</p>
+#### Examples
 
-<p align="center">
-  <a target="_blank" href="https://github.com/appwrite/appwrite">
-  <img alt="special sponsor appwrite" src="https://sponsors.vuejs.org/images/appwrite.svg" width="300">
-  </a>
-</p>
+Appears under "Features" header, `compiler` subheader:
 
-<p align="center">
-  <a target="_blank" href="https://vuejs.org/sponsor/#current-sponsors">
-    <img alt="sponsors" src="https://sponsors.vuejs.org/sponsors.svg?v2">
-  </a>
-</p>
+```
+feat(compiler): add 'comments' option
+```
 
-## Questions
+Appears under "Bug Fixes" header, `v-model` subheader, with a link to issue #28:
 
-For questions and support please use [the official forum](https://forum.vuejs.org) or [community chat](https://chat.vuejs.org/). The issue list of this repo is **exclusively** for bug reports and feature requests.
+```
+fix(v-model): handle events on blur
 
-## Issues
+close #28
+```
 
-Please make sure to respect issue requirements and use [the new issue helper](https://new-issue.vuejs.org/) when opening an issue. Issues not conforming to the guidelines may be closed immediately.
+Appears under "Performance Improvements" header, and under "Breaking Changes" with the breaking change explanation:
 
-## Stay In Touch
+```
+perf(core): improve vdom diffing by removing 'foo' option
 
-- [Twitter](https://twitter.com/vuejs)
-- [Blog](https://blog.vuejs.org/)
-- [Job Board](https://vuejobs.com/?ref=vuejs)
+BREAKING CHANGE: The 'foo' option has been removed.
+```
 
-## Contribution
+The following commit and commit `667ecc1` do not appear in the changelog if they are under the same release. If not, the revert commit appears under the "Reverts" header.
 
-Please make sure to read the [Contributing Guide](https://github.com/vuejs/core/blob/main/.github/contributing.md) before making a pull request. If you have a Vue-related project/component/tool, add it with a pull request to [this curated list](https://github.com/vuejs/awesome-vue)!
+```
+revert: feat(compiler): add 'comments' option
 
-Thank you to all the people who already contributed to Vue!
+This reverts commit 667ecc1654a317a13331b17617d973392f415f02.
+```
 
-<a href="https://github.com/vuejs/core/graphs/contributors"><img src="https://opencollective.com/vuejs/contributors.svg?width=890" /></a>
+### Full Message Format
 
-## License
+A commit message consists of a **header**, **body** and **footer**.  The header has a **type**, **scope** and **subject**:
 
-[MIT](https://opensource.org/licenses/MIT)
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
 
-Copyright (c) 2013-present, Yuxi (Evan) You
+The **header** is mandatory and the **scope** of the header is optional.
+
+### Revert
+
+If the commit reverts a previous commit, it should begin with `revert: `, followed by the header of the reverted commit. In the body, it should say: `This reverts commit <hash>.`, where the hash is the SHA of the commit being reverted.
+
+### Type
+
+If the prefix is `feat`, `fix` or `perf`, it will appear in the changelog. However, if there is any [BREAKING CHANGE](#footer), the commit will always appear in the changelog.
+
+Other prefixes are up to your discretion. Suggested prefixes are `docs`, `chore`, `style`, `refactor`, and `test` for non-changelog related tasks.
+
+### Scope
+
+The scope could be anything specifying the place of the commit change. For example `core`, `compiler`, `ssr`, `v-model`, `transition` etc...
+
+### Subject
+
+The subject contains a succinct description of the change:
+
+* use the imperative, present tense: "change" not "changed" nor "changes"
+* don't capitalize the first letter
+* no dot (.) at the end
+
+### Body
+
+Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes".
+The body should include the motivation for the change and contrast this with previous behavior.
+
+### Footer
+
+The footer should contain any information about **Breaking Changes** and is also the place to
+reference GitHub issues that this commit **Closes**.
+
+**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
