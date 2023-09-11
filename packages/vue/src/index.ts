@@ -27,6 +27,7 @@ function compileToFunction(
   }
 
   const key = template
+  // 编译之后，缓存下来
   const cached = compileCache[key]
   if (cached) {
     return cached

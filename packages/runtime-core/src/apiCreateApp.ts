@@ -253,6 +253,7 @@ export function createAppAPI<HostElement>(
         }
       },
 
+      // 注册插件，app 传入到插件方法里面
       use(plugin: Plugin, ...options: any[]) {
         if (installedPlugins.has(plugin)) {
           __DEV__ && warn(`Plugin has already been applied to target app.`)
