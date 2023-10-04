@@ -19,8 +19,9 @@ type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
 // The number of effects currently being tracked recursively.
+// 递归嵌套执行effect函数的深度
 let effectTrackDepth = 0
-
+// 用于标识依赖收集的状态
 export let trackOpBit = 1
 
 /**
@@ -28,6 +29,7 @@ export let trackOpBit = 1
  * This value is chosen to enable modern JS engines to use a SMI on all platforms.
  * When recursion depth is greater, fall back to using a full cleanup.
  */
+// 表示最大标记的位数
 const maxMarkerBits = 30
 
 export type EffectScheduler = (...args: any[]) => any
@@ -52,6 +54,7 @@ export const MAP_KEY_ITERATE_KEY = Symbol(__DEV__ ? 'Map key iterate' : '')
 
 export class ReactiveEffect<T = any> {
   active = true
+  // effect 存储相关的deps依赖
   deps: Dep[] = []
   parent: ReactiveEffect | undefined = undefined
 
@@ -80,6 +83,7 @@ export class ReactiveEffect<T = any> {
     public scheduler: EffectScheduler | null = null,
     scope?: EffectScope
   ) {
+    // effectScope的相关处理逻辑
     recordEffectScope(this, scope)
   }
 
@@ -99,10 +103,11 @@ export class ReactiveEffect<T = any> {
       this.parent = activeEffect
       activeEffect = this
       shouldTrack = true
-
+      // 根据递归的深度记录位数
       trackOpBit = 1 << ++effectTrackDepth
-
+      // 如果超过maxMarkerBits,则trackOpBit的计算会超过最大整型的位数，将其降级为cleanupEffect
       if (effectTrackDepth <= maxMarkerBits) {
+        // 给依赖打上标记
         initDepMarkers(this)
       } else {
         cleanupEffect(this)
@@ -110,9 +115,10 @@ export class ReactiveEffect<T = any> {
       return this.fn()
     } finally {
       if (effectTrackDepth <= maxMarkerBits) {
+        // 完成依赖标记
         finalizeDepMarkers(this)
       }
-
+      // 恢复到上一级
       trackOpBit = 1 << --effectTrackDepth
 
       activeEffect = this.parent
@@ -184,16 +190,21 @@ export function effect<T = any>(
   if ((fn as ReactiveEffectRunner).effect) {
     fn = (fn as ReactiveEffectRunner).effect.fn
   }
-
+  // 创建_effect实例
   const _effect = new ReactiveEffect(fn)
   if (options) {
+    // 把options中的属性复制到_effect中
     extend(_effect, options)
+    // 与effectScope相关的处理逻辑
     if (options.scope) recordEffectScope(_effect, options.scope)
   }
   if (!options || !options.lazy) {
+    // 立即执行
     _effect.run()
   }
+  // 绑定run函数，作为effect runner
   const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
+  // 在runner中保留对_effect的引用
   runner.effect = _effect
   return runner
 }
@@ -270,16 +281,21 @@ export function trackEffects(
   let shouldTrack = false
   if (effectTrackDepth <= maxMarkerBits) {
     if (!newTracked(dep)) {
+      // 标记新依赖
       dep.n |= trackOpBit // set newly tracked
+      // 如果依赖已经被收集，则不需要再次收集
       shouldTrack = !wasTracked(dep)
     }
   } else {
     // Full cleanup mode.
+    // cleanup 模式
     shouldTrack = !dep.has(activeEffect!)
   }
 
   if (shouldTrack) {
+    // 收集当前激活的effect作为依赖
     dep.add(activeEffect!)
+    // 当前激活的effect收集dep集合作为依赖
     activeEffect!.deps.push(dep)
     if (__DEV__ && activeEffect!.onTrack) {
       activeEffect!.onTrack(

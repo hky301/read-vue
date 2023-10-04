@@ -1390,6 +1390,8 @@ function baseCreateRenderer(
         }
         // mounted hook
         if (m) {
+          // queuePostRenderEffect 如果不使用 queuePostRenderEffect，那么在子组件执行mounted钩子函数的时候，
+          // 若父组件的DOM还没有被插入，会导致访问不到父组件的DOM节点。在整个应用渲染完毕后再依次执行mounted钩子函数，就能保证每个组件的DOM元素都是可以访问的。
           queuePostRenderEffect(m, parentSuspense)
         }
         // onVnodeMounted
@@ -1461,6 +1463,7 @@ function baseCreateRenderer(
           next = vnode
         }
 
+        // 在beforeUpdate钩子函数执行时，组件的DOM还未更新。如果想在组件更新前访问DOM，比如手动移除已添加的事件侦听器，可以注册这个钩子函数
         // beforeUpdate hook
         if (bu) {
           invokeArrayFns(bu)
@@ -2412,34 +2415,48 @@ function getSequence(arr: number[]): number[] {
   let i, j, u, v, c
   const len = arr.length
   for (i = 0; i < len; i++) {
+    // arrI 为当前顺序取出的元素
     const arrI = arr[i]
+    // 排除 0 的情况
     if (arrI !== 0) {
+      // result 存储的是长度为 i 的递增子序列最小末尾值的索引
       j = result[result.length - 1]
+      // arr[j] 为末尾值，如果满足arr[j] < arrI，那么直接在当前递增子序列后面添加
       if (arr[j] < arrI) {
+        // 存储 result 更新前的最后一个索引的值
         p[i] = j
+        // 存储元素对应的索引值
         result.push(i)
         continue
       }
+      // 不满足，则执行二分搜索
       u = 0
       v = result.length - 1
+      // 查找第一个比arrI小的节点，更新result的值
       while (u < v) {
+        // c 记录中间的位置
         c = (u + v) >> 1
         if (arr[result[c]] < arrI) {
+          // 若中间的值小于arrI，则在右边，更新下沿
           u = c + 1
         } else {
+          // 更新上沿
           v = c
         }
       }
+      // 找到第一个比arrI小的位置u，插入它
       if (arrI < arr[result[u]]) {
         if (u > 0) {
           p[i] = result[u - 1]
         }
+        // 存储插入的位置 i
         result[u] = i
       }
     }
   }
   u = result.length
   v = result[u - 1]
+  // 回溯数组p，找到最终的索引
   while (u-- > 0) {
     result[u] = v
     v = p[v]

@@ -663,9 +663,11 @@ export function setupComponent(
 
   const { props, children } = instance.vnode
   const isStateful = isStatefulComponent(instance)
+  // 初始化 props
   initProps(instance, props, isStateful, isSSR)
+  // 初始化插槽
   initSlots(instance, children)
-
+  // 设置有状态的组件实例。所谓有状态，指的是组件会在渲染过程中把一些状态挂载到组件实例对应的属性上。
   const setupResult = isStateful
     ? setupStatefulComponent(instance, isSSR)
     : undefined
@@ -759,6 +761,7 @@ function setupStatefulComponent(
         )
       }
     } else {
+      // 处理setup返回值
       handleSetupResult(instance, setupResult, isSSR)
     }
   } else {

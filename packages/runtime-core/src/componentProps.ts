@@ -198,7 +198,7 @@ export function initProps(
   def(attrs, InternalObjectKey, 1)
 
   instance.propsDefaults = Object.create(null)
-
+  // 设置props的值
   setFullProps(instance, rawProps, props, attrs)
 
   // ensure all declared prop keys are present

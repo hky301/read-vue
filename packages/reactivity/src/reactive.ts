@@ -51,6 +51,7 @@ function targetTypeMap(rawType: string) {
     case 'WeakSet':
       return TargetType.COLLECTION
     default:
+      // 举例而言，Date类型、RegExp类型、Promise类型
       return TargetType.INVALID
   }
 }

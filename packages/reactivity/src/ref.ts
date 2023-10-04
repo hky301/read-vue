@@ -36,7 +36,7 @@ type RefBase<T> = {
   dep?: Dep
   value: T
 }
-
+// 这里直接把ref的相关依赖保存到了dep属性上，而在track函数的实现中，会把依赖保留到全局的tragetMap中
 export function trackRefValue(ref: RefBase<any>) {
   if (shouldTrack && activeEffect) {
     ref = toRaw(ref)
@@ -126,6 +126,7 @@ export function shallowRef(value?: unknown) {
 
 function createRef(rawValue: unknown, shallow: boolean) {
   if (isRef(rawValue)) {
+    // 如果传入的就是一个ref，那么返回其自身即可，处理嵌套ref的情况
     return rawValue
   }
   return new RefImpl(rawValue, shallow)
@@ -143,6 +144,7 @@ class RefImpl<T> {
     public readonly __v_isShallow: boolean
   ) {
     this._rawValue = __v_isShallow ? value : toRaw(value)
+    // 非shallow时，执行原始值的转换
     this._value = __v_isShallow ? value : toReactive(value)
   }
 

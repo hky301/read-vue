@@ -24,6 +24,7 @@ export function provide<T, K = InjectionKey<T> | string | number>(
     const parentProvides =
       currentInstance.parent && currentInstance.parent.provides
     if (parentProvides === provides) {
+      // 由直接引用改成继承
       provides = currentInstance.provides = Object.create(parentProvides)
     }
     // TS doesn't allow symbol as index type
@@ -56,6 +57,7 @@ export function inject(
     // #2400
     // to support `app.use` plugins,
     // fallback to appContext's `provides` if the instance is at root
+    // 从它的父组件的 provides 开始查找
     const provides = instance
       ? instance.parent == null
         ? instance.vnode.appContext && instance.vnode.appContext.provides
@@ -66,6 +68,7 @@ export function inject(
       // TS doesn't allow symbol as index type
       return provides[key as string]
     } else if (arguments.length > 1) {
+      // 默认值也支持函数
       return treatDefaultAsFactory && isFunction(defaultValue)
         ? defaultValue.call(instance && instance.proxy)
         : defaultValue

@@ -25,6 +25,7 @@ export function injectHook(
     // cache the error handling wrapper for injected hooks so the same hook
     // can be properly deduped by the scheduler. "__weh" stands for "with error
     // handling".
+    // 封装钩子函数并缓存
     const wrappedHook =
       hook.__weh ||
       (hook.__weh = (...args: unknown[]) => {
